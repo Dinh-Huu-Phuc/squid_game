@@ -69,7 +69,7 @@ class GameUI extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              'TIME: ${gameState.remainingTime}s',
+              'Thời Gian: ${gameState.remainingTime}s',
               style: GameTextStyles.gameTimer,
             ),
             // Text(

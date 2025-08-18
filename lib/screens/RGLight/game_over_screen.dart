@@ -14,10 +14,10 @@ class GameOverScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('ELIMINATED!', style: GameTextStyles.eliminated),
+            const Text('Bị Loại!', style: GameTextStyles.eliminated),
             const SizedBox(height: 20),
             const Text(
-              'YOU MOVED DURING RED LIGHT!',
+              'Bạn Đã Bị Loại Khi Chạy Đèn Đỏ!',
               style: GameTextStyles.subtitle,
             ),
             const SizedBox(height: 30),
@@ -33,7 +33,7 @@ class GameOverScreen extends StatelessWidget {
                       vertical: 15,
                     ),
                   ),
-                  child: const Text('TRY AGAIN', style: GameTextStyles.button),
+                  child: const Text('THỬ LẠI', style: GameTextStyles.button),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -47,7 +47,7 @@ class GameOverScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'BACK TO MENU',
+                    'TRỞ LẠI MENU',
                     style: GameTextStyles.button,
                   ),
                 ),

@@ -24,7 +24,7 @@ class WinScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('WINNER!', style: GameTextStyles.winner),
+                const Text('Bạn Thắng!', style: GameTextStyles.winner),
                 const SizedBox(height: 20),
                 const Text(
                   'BẠN ĐÃ SỐNG SÓT QUA ĐÈN ĐỎ ĐÈN XANH!',
@@ -44,7 +44,7 @@ class WinScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'PLAY AGAIN',
+                        'Chơi lại',
                         style: GameTextStyles.button,
                       ),
                     ),
@@ -62,7 +62,7 @@ class WinScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'BACK TO MENU',
+                        'Trở lại MENU',
                         style: GameTextStyles.button,
                       ),
                     ),

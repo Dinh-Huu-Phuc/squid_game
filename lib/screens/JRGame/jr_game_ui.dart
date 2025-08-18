@@ -50,7 +50,7 @@ class JRGameUI extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'TIME: ${gameState.gameTimeLeft}',
+              'Thời Gian: ${gameState.gameTimeLeft}',
               style: const TextStyle(
                 color: JRGameConstants.textWhite,
                 fontSize: 18,
@@ -67,7 +67,7 @@ class JRGameUI extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
-              'JUMP ROPE',
+              'NHẢY DÂY',
               style: TextStyle(
                 color: JRGameConstants.textWhite,
                 fontSize: 18,

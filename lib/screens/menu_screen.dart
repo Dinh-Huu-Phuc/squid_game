@@ -46,7 +46,7 @@ class MenuScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Chọn thử thách của bạn',
+                'MENU \nChọn thử thách của bạn',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,

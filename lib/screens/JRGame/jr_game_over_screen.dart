@@ -22,7 +22,7 @@ class JRGameOverScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              isWinner ? 'SURVIVOR!' : 'ELIMINATED!',
+              isWinner ? 'Bạn Đã Sống!' : 'Bị Loại!',
               style: TextStyle(
                 fontSize: 52,
                 fontWeight: FontWeight.w900,
@@ -73,7 +73,7 @@ class JRGameOverScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'PLAY AGAIN',
+                    'CHƠI LẠI',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -95,7 +95,7 @@ class JRGameOverScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'BACK TO MENU',
+                    'TRỞ LẠI MENU',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -115,11 +115,11 @@ class JRGameOverScreen extends StatelessWidget {
 
   String _getGameOverMessage() {
     if (isWinner) {
-      return 'You escaped! Well done!';
+      return 'Bạn đã thoát rồi! Làm tốt lắm!';
     } else if (isPlayerDead) {
-      return 'You hit the rope or moved during red light!';
+      return 'Bạn va vào dây hoặc di chuyển khi đèn đỏ!';
     } else {
-      return 'Time\'s up! You didn\'t escape in time!';
+      return 'Thời gian đã hết! \nBạn đã không thoát kịp!';
     }
   }
 }
