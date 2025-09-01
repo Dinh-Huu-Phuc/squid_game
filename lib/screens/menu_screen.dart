@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import '../game/RGLight/rg_light_game.dart';
 import '../game/JRGame/jr_game_screen.dart';
+import 'scores_screen.dart';
+import '../widgets/player_name_dialog.dart';
+import '../game/RGLight/rg_light_game.dart';
+
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -64,34 +67,57 @@ class MenuScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 60),
+
+              // Button Red-Green Light (RGLight) with player name dialog
               _buildGameButton(
                 context,
-                title: 'ĐÈN ĐỎ\nĐÈN XANH',
-                subtitle:
-                    'Di chuyển khi xanh, dừng lại khi đỏ!\nĐến đích để sống sót.',
-                color: Colors.green,
-                onTap: () {
+                title: 'Red-Green Light',
+                subtitle: 'Chạy khi đèn xanh, đứng khi đèn đỏ',
+                color: Colors.redAccent,
+                onTap: () async {
+                  final name = await askPlayerName(context);
+                  if (name == null || name.isEmpty) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const RGLightGame(),
+                      builder: (_) => RGLightGame(playerName: name),
                     ),
                   );
                 },
               ),
+
               const SizedBox(height: 30),
+
+              // Button Jump Rope (JRGame) with player name dialog
               _buildGameButton(
                 context,
-                title: 'THỬ THÁCH NHẢY DÂY',
-                subtitle:
-                    'Nhảy qua sợi dây để sống sót!\nChạy đến bục cao nhất để trốn thoát.',
-                color: Colors.red,
-                onTap: () {
+                title: 'Jump Rope',
+                subtitle: 'Nhảy dây đúng nhịp',
+                color: Colors.teal,
+                onTap: () async {
+                  final name = await askPlayerName(context);
+                  if (name == null || name.isEmpty) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const JRGameScreen(),
+                      builder: (_) => JRGameScreen(playerName: name),
                     ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 30),
+
+              // Button Scores Screen
+              _buildGameButton(
+                context,
+                title: 'BẢNG ĐIỂM',
+                subtitle: 'Xem lịch sử điểm các lần chơi',
+                color: Colors.blueGrey,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ScoresScreen()),
                   );
                 },
               ),
@@ -119,14 +145,14 @@ class MenuScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              color.withValues(alpha: 0.9),
-              color.withValues(alpha: 0.7),
+              color.withOpacity(0.9),
+              color.withOpacity(0.7),
             ],
           ),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),

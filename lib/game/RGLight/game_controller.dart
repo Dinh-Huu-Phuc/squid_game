@@ -4,10 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import '../../constants/game_constants.dart';
 import '../../models/game_state.dart';
+import '../../services/score_services.dart';
 
 class GameController extends ChangeNotifier {
+  final String _mode = "RGLight";
+  final String playerName;
   GameState _gameState = GameState.initial;
   GameState get gameState => _gameState;
+
+  final void Function({
+    required bool won, 
+    required int score, 
+    required int timeLeft, 
+    required int duration,
+    required String playerName,
+    })? onResult;
+
+  GameController({
+    this.onResult, 
+    required this.playerName
+  });
 
   // Controllers
   late AnimationController _playerAnimationController;
@@ -155,11 +171,57 @@ class GameController extends ChangeNotifier {
   }
 
   void _killPlayer() {
+    // Lưu điểm thua
+    final entry = ScoreEntry(
+      playerName: playerName, 
+      mode: _mode,
+      won: false,
+      timeLeft: 0,
+      duration: GameConstants.gameDuration,
+      score: 0,
+      createdAt: DateTime.now(),
+    );
+    ScoreService.addScore(entry); // fire-and-forget
+    onResult?.call(
+      won: false, 
+      score: 0, 
+      timeLeft: 0, 
+      duration: GameConstants.gameDuration,
+      playerName: playerName,
+    );
+
     _updateGameState(_gameState.copyWith(status: GameStatus.gameOver));
     _stopAllTimers();
   }
 
   void _winGame() {
+    // Tính & lưu điểm thắng
+    final timeLeft = _gameState.remainingTime;
+    final duration = GameConstants.gameDuration;
+    final score = ScoreService.computeScore(
+      won: true,
+      timeLeft: timeLeft,
+      duration: duration,
+    );
+
+    final entry2 = ScoreEntry(
+      playerName: playerName,          
+      mode: _mode,
+      won: true,
+      timeLeft: timeLeft,
+      duration: duration,
+      score: score,
+      createdAt: DateTime.now(),
+    );
+    ScoreService.addScore(entry2); // fire-and-forget
+    onResult?.call(
+      won: true, 
+      score: score, 
+      timeLeft: timeLeft, 
+      duration: duration,
+      playerName: playerName,       
+    );
+
     _updateGameState(_gameState.copyWith(status: GameStatus.won));
     _confettiController.play();
     _stopAllTimers();

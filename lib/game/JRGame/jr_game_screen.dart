@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math';
-
+import 'dart:async'; // để dùng FutureOr
 import 'constants/jr_game_constants.dart';
 import 'models/jr_game_state.dart';
 import '../../screens/JRGame/jr_start_screen.dart';
@@ -9,7 +9,9 @@ import '../../screens/JRGame/jr_game_ui.dart';
 import '../../screens/JRGame/jr_game_over_screen.dart';
 
 class JRGameScreen extends StatefulWidget {
-  const JRGameScreen({super.key});
+  final String playerName; // <-- giữ tham số playerName
+
+  const JRGameScreen({super.key, required this.playerName});
 
   @override
   State<JRGameScreen> createState() => _JRGameScreenState();
@@ -17,7 +19,8 @@ class JRGameScreen extends StatefulWidget {
 
 class _JRGameScreenState extends State<JRGameScreen>
     with TickerProviderStateMixin {
-  late JRGameState _gameState;
+  
+  late final JRGameState _gameState; // đổi _state -> _gameState cho nhất quán
 
   // Animation Controllers
   late AnimationController _jumpController;
@@ -28,12 +31,28 @@ class _JRGameScreenState extends State<JRGameScreen>
   @override
   void initState() {
     super.initState();
-    _initializeGameState();
-    _initializeAnimations();
-  }
 
-  void _initializeGameState() {
+    // Tạo JRGameState với playerName và onResult callback
     _gameState = JRGameState(
+      playerName: widget.playerName, // truyền playerName xuống JRGameState
+      onResult: ({
+        required bool won,
+        required int score,
+        required int timeLeft,
+        required int duration,
+        required String playerName,
+      }) async {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              won
+                  ? '$playerName thắng — $score/100 điểm'
+                  : '$playerName thua — 0/100 điểm',
+            ),
+          ),
+        );
+      },
       onStateChanged: () {
         if (mounted) setState(() {});
       },
@@ -44,6 +63,8 @@ class _JRGameScreenState extends State<JRGameScreen>
         _confettiController.play();
       },
     );
+
+    _initializeAnimations();
   }
 
   void _initializeAnimations() {

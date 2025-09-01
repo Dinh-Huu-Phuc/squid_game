@@ -8,9 +8,12 @@ import '../../widgets/move_button.dart';
 import '../../screens/RGLight/start_screen.dart';
 import '../../screens/RGLight/game_over_screen.dart';
 import '../../screens/RGLight/win_screen.dart';
+import '../../widgets/result_dialog.dart';
+import '../../constants/game_constants.dart';
 
 class RGLightGame extends StatefulWidget {
-  const RGLightGame({super.key});
+  final String playerName;
+  const RGLightGame({super.key, required this.playerName});
 
   @override
   State<RGLightGame> createState() => _RGLightGameState();
@@ -18,12 +21,43 @@ class RGLightGame extends StatefulWidget {
 
 class _RGLightGameState extends State<RGLightGame>
     with TickerProviderStateMixin {
-  late GameController _gameController;
+  late final GameController _gameController;
 
   @override
   void initState() {
     super.initState();
-    _gameController = GameController();
+    _gameController = GameController(
+      playerName: widget.playerName, // Truyền tên người chơi
+      onResult: ({
+        required bool won,
+        required int score,
+        required int timeLeft,
+        required int duration,
+        required String playerName,
+      }) async {
+        if (!mounted) return;
+        // Hiện thông báo kết quả bằng SnackBar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              won
+                  ? '$playerName Thắng - $score/100 điểm'
+                  : '$playerName Thua - 0/100 điểm',
+            ),
+          ),
+        );
+        // Nếu muốn hiện dialog kết quả, có thể gọi hàm bên dưới (comment nếu không dùng)
+        /*
+        await showGameResultDialog(context,
+          won: won,
+          score: score,
+          timeLeft: timeLeft,
+          duration: duration,
+          playerName: playerName,
+        );
+        */
+      },
+    );
     _gameController.initialize(this);
   }
 
@@ -44,32 +78,26 @@ class _RGLightGameState extends State<RGLightGame>
               // Background
               _buildBackground(),
 
-              // Game elements (only visible when game is started)
+              // Game elements (chỉ hiện khi game bắt đầu)
               if (_gameController.gameState.isGameStarted) ...[
-                // Game UI (guards, light indicator, stats)
                 GameUI(gameState: _gameController.gameState),
 
-                // Doll
                 DollWidget(
                   gameState: _gameController.gameState,
-                  dollRotationController:
-                      _gameController.dollRotationController,
+                  dollRotationController: _gameController.dollRotationController,
                 ),
 
-                // Finish line
                 const FinishLineWidget(),
 
-                // Player
                 PlayerWidget(gameState: _gameController.gameState),
 
-                // Move button
                 MoveButton(
                   gameState: _gameController.gameState,
                   onMove: _gameController.movePlayer,
                 ),
               ],
 
-              // Screens based on game state
+              // Màn hình theo trạng thái game
               if (!_gameController.gameState.isGameStarted)
                 StartScreen(onStartGame: _gameController.startGame),
 

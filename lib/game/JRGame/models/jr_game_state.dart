@@ -1,9 +1,22 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/services.dart';
+import '../../../services/score_services.dart';
 import '../constants/jr_game_constants.dart';
 
 class JRGameState {
+  final String _mode = "JRope";
+  final String playerName; 
+
+  // Callback thêm mới
+  final void Function({
+    required bool won, 
+    required int score, 
+    required int timeLeft, 
+    required int duration,
+    required String playerName,
+    })? onResult;
+
   // Game state
   bool isGameStarted = false;
   bool isGameOver = false;
@@ -30,7 +43,13 @@ class JRGameState {
   VoidCallback? onPlayerDeath;
   VoidCallback? onGameWon;
 
-  JRGameState({this.onStateChanged, this.onPlayerDeath, this.onGameWon});
+  JRGameState({
+    required this.playerName,
+    this.onResult,
+    this.onStateChanged,
+    this.onPlayerDeath,
+    this.onGameWon,
+  });
 
   void startGame() {
     isGameStarted = true;
@@ -45,7 +64,6 @@ class JRGameState {
     gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       gameTimeLeft--;
       _notifyStateChanged();
-
       if (gameTimeLeft <= 0) {
         gameOver(false);
       }
@@ -69,7 +87,6 @@ class JRGameState {
 
   void movePlayer(bool up) {
     if (!isGameStarted || isPlayerDead || isGameOver) return;
-
     isPlayerMoving = true;
     if (up && playerY > JRGameConstants.minPlayerY) {
       playerY -= JRGameConstants.playerSpeed;
@@ -77,7 +94,6 @@ class JRGameState {
       playerY += JRGameConstants.playerSpeed;
     }
     _notifyStateChanged();
-
     Timer(Duration(milliseconds: JRGameConstants.moveStopDelayMs), () {
       isPlayerMoving = false;
       _notifyStateChanged();
@@ -91,7 +107,6 @@ class JRGameState {
 
   void jump() {
     if (!isGameStarted || isPlayerDead || isGameOver || isPlayerJumping) return;
-
     isPlayerJumping = true;
     _notifyStateChanged();
   }
@@ -116,7 +131,6 @@ class JRGameState {
     isPlayerDead = true;
     _notifyStateChanged();
     onPlayerDeath?.call();
-
     Timer(Duration(seconds: JRGameConstants.deathDelaySeconds), () {
       gameOver(false);
     });
@@ -126,10 +140,33 @@ class JRGameState {
     isGameOver = true;
     isWinner = won;
     _notifyStateChanged();
-
     gameTimer?.cancel();
     legAnimationTimer?.cancel();
-
+    final duration = JRGameConstants.gameTimeLimit;
+    final timeLeft = won ? gameTimeLeft : 0;
+    final score = ScoreService.computeScore(
+      won: won,
+      timeLeft: timeLeft,
+      duration: duration,
+    );
+    ScoreService.addScore(ScoreEntry(
+      playerName: playerName,
+      mode: _mode,
+      won: won,
+      timeLeft: timeLeft,
+      duration: duration,
+      score: score,
+      createdAt: DateTime.now(),
+    ));
+    // Gọi callback onResult để UI bật dialog hoặc xử lý kết quả
+    onResult?.call(
+      won: won, 
+      score: score, 
+      timeLeft: timeLeft, 
+      duration: duration,
+      playerName: playerName,
+    );
+    
     if (won) {
       onGameWon?.call();
       HapticFeedback.lightImpact();
@@ -148,7 +185,6 @@ class JRGameState {
     gameTimeLeft = JRGameConstants.gameTimeLimit;
     showLeftLeg = true;
     _notifyStateChanged();
-
     gameTimer?.cancel();
     legAnimationTimer?.cancel();
   }
@@ -160,12 +196,10 @@ class JRGameState {
         playerJumpOffset < JRGameConstants.jumpSafetyOffset) {
       return false; // Player is jumping - no collision
     }
-
     double ropeCurrentX =
         screenWidth / 2 + sin(ropeRotation) * JRGameConstants.ropeSwingRadius;
     double playerCenterX = screenWidth / 2;
     double playerCurrentY = playerY + playerJumpOffset;
-
     // Very precise collision - only when rope actually overlaps with player ON GROUND
     bool playerInRopeArea =
         (playerCurrentY > JRGameConstants.ropeTopStart &&
@@ -174,7 +208,6 @@ class JRGameState {
     bool ropeHitsPlayer =
         (ropeCurrentX > playerCenterX - JRGameConstants.ropeCollisionBuffer &&
             ropeCurrentX < playerCenterX + JRGameConstants.ropeCollisionBuffer);
-
     return playerInRopeArea && ropeHitsPlayer;
   }
 
