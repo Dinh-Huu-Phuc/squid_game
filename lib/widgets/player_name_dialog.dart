@@ -12,7 +12,7 @@ Future<String?> askPlayerName(BuildContext context) async {
         controller: controller,
         autofocus: true,
         textInputAction: TextInputAction.done,
-        decoration: const InputDecoration(hintText: 'Ví dụ: Phúc'),
+        decoration: const InputDecoration(hintText: 'Ví dụ: Tần Thủy Hoàng'),
         onSubmitted: (_) => Navigator.of(ctx).pop(controller.text.trim()),
       ),
       actions: [

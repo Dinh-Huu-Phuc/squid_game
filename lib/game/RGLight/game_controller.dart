@@ -13,17 +13,15 @@ class GameController extends ChangeNotifier {
   GameState get gameState => _gameState;
 
   final void Function({
-    required bool won, 
-    required int score, 
-    required int timeLeft, 
+    required bool won,
+    required int score,
+    required int timeLeft,
     required int duration,
     required String playerName,
-    })? onResult;
+  })?
+  onResult;
 
-  GameController({
-    this.onResult, 
-    required this.playerName
-  });
+  GameController({this.onResult, required this.playerName});
 
   // Controllers
   late AnimationController _playerAnimationController;
@@ -74,16 +72,20 @@ class GameController extends ChangeNotifier {
     );
 
     // Start the game timer
+    // Start the game timer
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final newTime = _gameState.remainingTime - 1;
 
-      if (newTime <= 0) {
+      if (newTime < 0) {
+        // Kết thúc thật sự sau khi đã hiển thị 0 một nhịp
         timer.cancel();
         _lightChangeTimer?.cancel();
         _updateGameState(_gameState.copyWith(status: GameStatus.gameOver));
-      } else {
-        _updateGameState(_gameState.copyWith(remainingTime: newTime));
+        return;
       }
+
+      // Cập nhật thời gian (bao gồm cả khi newTime == 0 để UI hiển thị số 0)
+      _updateGameState(_gameState.copyWith(remainingTime: newTime));
     });
 
     // Start light changes
@@ -173,7 +175,7 @@ class GameController extends ChangeNotifier {
   void _killPlayer() {
     // Lưu điểm thua
     final entry = ScoreEntry(
-      playerName: playerName, 
+      playerName: playerName,
       mode: _mode,
       won: false,
       timeLeft: 0,
@@ -183,9 +185,9 @@ class GameController extends ChangeNotifier {
     );
     ScoreService.addScore(entry); // fire-and-forget
     onResult?.call(
-      won: false, 
-      score: 0, 
-      timeLeft: 0, 
+      won: false,
+      score: 0,
+      timeLeft: 0,
       duration: GameConstants.gameDuration,
       playerName: playerName,
     );
@@ -205,7 +207,7 @@ class GameController extends ChangeNotifier {
     );
 
     final entry2 = ScoreEntry(
-      playerName: playerName,          
+      playerName: playerName,
       mode: _mode,
       won: true,
       timeLeft: timeLeft,
@@ -215,11 +217,11 @@ class GameController extends ChangeNotifier {
     );
     ScoreService.addScore(entry2); // fire-and-forget
     onResult?.call(
-      won: true, 
-      score: score, 
-      timeLeft: timeLeft, 
+      won: true,
+      score: score,
+      timeLeft: timeLeft,
       duration: duration,
-      playerName: playerName,       
+      playerName: playerName,
     );
 
     _updateGameState(_gameState.copyWith(status: GameStatus.won));

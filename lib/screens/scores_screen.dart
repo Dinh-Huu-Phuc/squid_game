@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:flutter/material.dart';
 import '../services/score_services.dart';
 
@@ -17,9 +19,12 @@ class _ScoresScreenState extends State<ScoresScreen> {
     _future = ScoreService.getScores();
   }
 
-  Future<void> _reload() async {
-    final data = await ScoreService.getScores();
-    if (mounted) setState(() => _future = Future.value(data));
+  // Không async, không await – chỉ tạo Future mới và gán lại trong setState
+  void _reload() {
+    if (!mounted) return;
+    setState(() {
+      _future = ScoreService.getScores();
+    });
   }
 
   @override
@@ -30,40 +35,46 @@ class _ScoresScreenState extends State<ScoresScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_forever),
+            tooltip: 'Xóa tất cả',
             onPressed: () async {
               await ScoreService.clearAll();
-              await _reload();
+              _reload();
             },
-            tooltip: 'Xóa tất cả',
           ),
         ],
       ),
       body: FutureBuilder<List<ScoreEntry>>(
         future: _future,
         builder: (context, snap) {
-          if (!snap.hasData) {
+          if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          final scores = snap.data!;
+          if (snap.hasError) {
+            return Center(child: Text('Lỗi: ${snap.error}'));
+          }
+          final scores = snap.data ?? const <ScoreEntry>[];
           if (scores.isEmpty) {
             return const Center(child: Text('Chưa có điểm nào, chơi thử đi!'));
           }
           return ListView.separated(
             padding: const EdgeInsets.all(12),
+            itemCount: scores.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (c, i) {
               final s = scores[i];
               return ListTile(
                 leading: CircleAvatar(child: Text('${s.score}')),
                 title: Text('${s.playerName} — ${s.mode} — ${s.won ? 'Thắng' : 'Thua'}'),
                 subtitle: Text(
-                  (s.won ? 'Còn ${s.timeLeft}s/${s.duration}s' : '0/${s.duration}s')
-                  + ' • ${s.createdAt.toLocal()}',
+                  (s.won ? 'Còn ${s.timeLeft}s/${s.duration}s' : '0/${s.duration}s') +
+                  ' • ${s.createdAt.toLocal()}',
                 ),
-                trailing: Text('${s.score}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                trailing: Text(
+                  '${s.score}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               );
             },
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemCount: scores.length,
           );
         },
       ),

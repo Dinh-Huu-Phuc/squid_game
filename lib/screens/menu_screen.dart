@@ -1,9 +1,11 @@
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../game/JRGame/jr_game_screen.dart';
 import 'scores_screen.dart';
 import '../widgets/player_name_dialog.dart';
 import '../game/RGLight/rg_light_game.dart';
-
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -117,9 +119,69 @@ class MenuScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ScoresScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const ScoresScreen(),
+                    ),
                   );
                 },
+              ),
+              SizedBox(height: 30),
+
+              // Exit Game (nhỏ hơn)
+              GestureDetector(
+                onTap: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder:
+                        (ctx) => AlertDialog(
+                          title: const Text("Xác nhận thoát"),
+                          content: const Text(
+                            "Bạn có chắc chắn muốn thoát game không?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text("Không"),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: const Text("Có"),
+                            ),
+                          ],
+                        ),
+                  );
+
+                  if (confirm == true) {
+                    SystemNavigator.pop(); // thoát app
+                  }
+                },
+                child: Container(
+                  width:
+                      MediaQuery.of(context).size.width * 0.5, // nhỏ hơn ~50%
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    "THOÁT GAME",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Courier',
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -144,10 +206,7 @@ class MenuScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              color.withOpacity(0.9),
-              color.withOpacity(0.7),
-            ],
+            colors: [color.withOpacity(0.9), color.withOpacity(0.7)],
           ),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
